@@ -1,30 +1,26 @@
 import { useState } from "react";
+import RichTextEditor from "./RichTextEditor";
+import MyForm from "./MyForm";
+import useFormSubmit from "../shared/hooks";
 
 interface MainProps {
     text:string;
 }
 
 const Main: React.FC<MainProps> = ({text}) => {
-    const [generatedText, setGeneratedText] = useState('');
+  const { generatedText, handleSubmit, handleClearEditor } = useFormSubmit();
 text = 'here is Main'
-  const handleSubmit = (data: any) => {
-    const { username, product, company } = data;
-    const newText = `Hello ${username}, thank you for purchasing ${product} from ${company}. Sincerely, ${company}.`;
-    setGeneratedText(newText);
-  };
+  
 
-  const handleClearEditor = () => {
-    setGeneratedText('');
-  };
+
   
     return (
-      <div>
+      <><div>
         {text}
-      </div>
-       /*  <div>
-        <MyForm onSubmit={handleSubmit} />
-        <RichTextEditor text={generatedText} onClearEditor={handleClearEditor} />
-      </div> */
+      </div><div>
+          <MyForm onSubmit={handleSubmit} />
+          <RichTextEditor text={generatedText} onClearEditor={handleClearEditor} />
+        </div></>
     );
   };
   
