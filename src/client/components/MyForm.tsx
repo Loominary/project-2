@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
+import { TemplateType } from '../shared/types';
 
 interface FormData {
-  username: string;
-  product: string;
-  company: string;
+  tempId:number;
 }
 
 
@@ -20,15 +19,15 @@ export type CustomerType ={
   type:number;
 }
 const initialValues: FormData = {
-  username: '',
-  product: '',
-  company: '',
+  tempId:0,
 };
 
 const MyForm: React.FC<FormProps> = ({ onSubmit }) => {
 const [customers, setCustomers] = useState<Array<CustomerType>>([])
+const [templateData, setTemplateData] = useState<Array<TemplateType>>([]);
 
-useEffect(()=>{
+
+/* useEffect(()=>{
   getCustomers();
 }, []);
 
@@ -40,29 +39,34 @@ useEffect(()=>{
       console.log(json);
       
     })
-  }
+  } */
 
 
   const handleSubmit = (values: FormData) => {
     onSubmit(values);
+    console.log('getTemplate here');
+    fetch(`http://localhost:3000/templates/${values.tempId}`, {
+      method: 'GET'
+    })
+      .then(res => res.json())
+      .then(json => {
+        setTemplateData(json); 
+      })
+      .catch((error) => {
+        console.error('Error fetching: ', error);
+      })
+      console.log(templateData[0]);
+      
   };
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
       <Form>
         <div>
-          <label htmlFor="username">Username:</label>
-          <Field type="text" id="username" name="username" />
+          <label htmlFor="tempId">ID:</label>
+          <Field type="number" id="tempId" name="tempId" />
         </div>
-        <div>
-          <label htmlFor="product">Product:</label>
-          <Field type="text" id="product" name="product" />
-        </div>
-        <div>
-          <label htmlFor="company">Company:</label>
-          <Field type="text" id="company" name="company" />
-        </div>
-        <button type="submit">Generate Text</button>
+        <button type="submit">Find</button>
       </Form>
     </Formik>
   );

@@ -3,10 +3,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const headers = require('./middleware/headers.js')
+const headers = require('./middleware/headers.js');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var customersRouter = require('./routes/customers.js');
+var templatesRouter = require('./routes/templates.js');
 
 var app = express();
 
@@ -20,5 +21,6 @@ app.use(headers);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/customers', customersRouter);
+app.use('/templates', templatesRouter);
 
 module.exports = app;

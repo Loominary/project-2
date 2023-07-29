@@ -16,7 +16,7 @@ module.exports = {
         }
     },
     getCustomerById: async function (req,res,next){
-        const param = req.query;
+        const param = req.params;
 
         const schema = joi.object({
             custId: joi.number().required().min(1),

@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { CustomerType } from './MyForm';
+import { error } from 'console';
+import { useCustomerContext } from '../Context/CustomerProvider';
+import { TemplateType } from '../shared/types';
 
 interface FormData {
   custId:number;
 }
+
 
 interface Template {
   text:string;
@@ -19,7 +23,12 @@ const initialValues: FormData = {
 };
 
 const TestForm: React.FC<FormProps> = ({ onSubmitTest }) => {
-const [customers, setCustomers] = useState<Array<CustomerType>>([])
+const [customersData, setCustomersData] = useState<Array<CustomerType>>([]);
+const [templateData, setTemplateData] = useState<Array<TemplateType>>([]);
+const { customers, setCustomers } = useCustomerContext();
+
+
+
 
 //mock data
 const data = `Hello {username}, thank you for purchasing {product} from {company}. Sincerely, {company}.`
@@ -29,43 +38,54 @@ const someObj ={
   product:'You',
   company: 'Everyone'
 }
+useEffect(() => {
+  console.log(customers);
+  
+}, [customers]);
 
 
 
-/* useEffect(()=>{
-  getCustomers();
-}, []);
-
-  function getCustomers(){
-    fetch('http://localhost:3000/customers',{
-      method: 'GET',
-    }).then (res=>res.json()).then(json=>{      
-      setCustomers(json);      
-      console.log(json);
-      
+function getCustomers(custId: number) {
+  console.log('getCustomers here');
+  fetch(`http://localhost:3000/customers/${custId}`, {
+    method: 'GET'
+  })
+    .then(res => res.json())
+    .then(json => {
+      setCustomers(json); // Use setCustomers directly, it's available in this scope
     })
-  } */
-
-function getCustomers(custId:number){
-console.log('getCustomers here');
-fetch(`http://localhost:3001/customers?id=${custId}`,{
-  method:'GET'
-})//.then(res=> res.json()).then(json=>{setCustomers(json)})
-
-
+    .catch((error) => {
+      console.error('Error fetching: ', error);
+    });
 }
 
-const runFilter = ()=>{
-console.log(data);
-//getCustomers(1);
-console.log(customers);
-
-//const entries = Object.entries(this.results)
-// const replacedData = data.replace(regex, (match:string, placeholder:string)=>{
-//   for (const entry of someObj)
-// })
+function getTemplate(tempId:number){
+  console.log('getTemplate here');
+  fetch(`http://localhost:3000/templates/${tempId}`, {
+    method: 'GET'
+  })
+    .then(res => res.json())
+    .then(json => {
+      setTemplateData(json); // Use setCustomers directly, it's available in this scope
+    })
+    .catch((error) => {
+      console.error('Error fetching: ', error);
+    });
   
 }
+
+function runFilter(){
+let custData= customers[0];
+console.log(templateData);
+console.log(custData.id);
+
+}
+
+function templateRun(){
+
+}
+
+
   const handleSubmitTest = (values: FormData) => {
     const custId = values.custId;
     //console.log(values.custId);
@@ -86,7 +106,8 @@ console.log(customers);
         <button type="submit">Find</button>
       </Form>
     </Formik>
-    <button onClick={runFilter}>Take template and replace fields with values</button>
+    <button onClick={runFilter}>Log Check</button>
+    
     </>
     
   );

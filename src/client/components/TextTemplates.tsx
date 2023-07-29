@@ -1,17 +1,17 @@
 import React from 'react';
 
 interface TextTemplateProps {
-  username: string;
+  name: string;
   product: string;
-  company: string;
+  location: string;
 }
 
 const TextTemplate: React.FC<TextTemplateProps> = ({
-  username,
+  name,
   product,
-  company,
+  location,
 }) => {
-  const textTemplate = `Hello ${username}, thank you for purchasing ${product} from ${company}. Sincerely, ${company}.`;
+  const textTemplate = `Hello ${name}, thank you for purchasing ${product} from ${location}. Sincerely, ${location}.`;
 
   return <div>{textTemplate}</div>;
 };
