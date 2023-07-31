@@ -6,6 +6,8 @@ import { useCustomerContext, CustomerContext } from '../Context/CustomerProvider
 import { TemplateType } from '../shared/types';
 import { useCustomerData, useFormSubmit } from '../shared/hooks';
 import RichTextEditor from './RichTextEditor';
+import QuillEditor from './QuillEditor';
+import EditorConvertToHTML from './testeditor';
 
 interface FormData {
   custId:number;
@@ -25,21 +27,15 @@ const initialValues: FormData = {
 };
 
 const TestForm: React.FC<FormProps> = ({ onSubmitTest }) => {
-const [customersData, setCustomersData] = useState<Array<CustomerType>>([]);
 const [templateData, setTemplateData] = useState<Array<TemplateType>>([]);
 const { handleClearEditor } = useFormSubmit();
 const [generatedText, setGeneratedText] = useState('');
+
 
 const [templateId, setTemplateId] = useState<number | undefined>(undefined);
 
 const { customers, setCustomers } = useCustomerContext();
 const customer = useCustomerData()
-
-
-useEffect(() => {
-  console.log(customers);
-  
-}, [customers]);
 
 
 
@@ -68,6 +64,14 @@ async function getTemplateById(templateId:number){
 function replacePlaceholders(template: string, customer: any) {
   return template.replace(/{(.*?)}/g, (match, key) => customer[key.trim()] || '');
 }
+const makeBold = (input: string): React.ReactNode => {
+  const pattern = /\*\*(.*?)\*\*/g;
+  const parts = input.split(pattern);
+
+  return parts.map((part, index) =>
+    pattern.test(part) ? <strong key={index}>{part.replace(/\*\*/g, '')}</strong> : part
+  );
+};
 
 function runFilter(){
 let custData= customers[0];
@@ -83,7 +87,8 @@ const handleTemplateClick = async ()=>{
       
       const template = await getTemplateById(templateId);
         const message = replacePlaceholders(template.text, customer[0]);
-        console.log(message);
+        const madeBold = makeBold(message);
+        console.log('madebold: '+ madeBold);
         setGeneratedText(message);
       
     }
@@ -124,6 +129,8 @@ console.warn('Please enter a valid template ID');
     </div>
     <div><p>----------------------------------------------------------</p></div>
     <RichTextEditor text={generatedText} onClearEditor={handleClearEditor} />
+    {/* <QuillEditor text={generatedText} onClearEditor={handleClearEditor} /> */}
+
     </>
     
   );
