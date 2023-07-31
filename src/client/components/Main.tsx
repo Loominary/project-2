@@ -1,7 +1,8 @@
 import { useState } from "react";
 import RichTextEditor from "./RichTextEditor";
 import MyForm from "./MyForm";
-import useFormSubmit from "../shared/hooks";
+import {useFormSubmit} from "../shared/hooks";
+import TestForm from "./TestForm";
 
 interface MainProps {
     text:string;
@@ -17,7 +18,9 @@ text = 'here is Main'
     return (
       <><div>
         {text}
-      </div><div>
+      </div>
+      <div>
+          <TestForm onSubmitTest={handleSubmit}/>
           <MyForm onSubmit={handleSubmit} />
           <RichTextEditor text={generatedText} onClearEditor={handleClearEditor} />
         </div></>

@@ -8,7 +8,7 @@ interface CustomerContextType {
   setCustomers: React.Dispatch<React.SetStateAction<CustomerType[]>>;
 }
 
-const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
+export const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
 export const useCustomerContext = () => {
   const context = useContext(CustomerContext);

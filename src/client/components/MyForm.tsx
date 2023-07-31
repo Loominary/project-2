@@ -27,19 +27,6 @@ const [customers, setCustomers] = useState<Array<CustomerType>>([])
 const [templateData, setTemplateData] = useState<Array<TemplateType>>([]);
 
 
-/* useEffect(()=>{
-  getCustomers();
-}, []);
-
-  function getCustomers(){
-    fetch('http://localhost:3000/customers',{
-      method: 'GET',
-    }).then (res=>res.json()).then(json=>{      
-      setCustomers(json);      
-      console.log(json);
-      
-    })
-  } */
 
 
   const handleSubmit = (values: FormData) => {

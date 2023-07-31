@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { CustomerContext } from '../Context/CustomerProvider';
 
 const useFormSubmit = () => {
   const [generatedText, setGeneratedText] = useState('');
@@ -20,4 +21,17 @@ const useFormSubmit = () => {
   };
 };
 
-export default useFormSubmit;
+
+const useCustomerData = () => {
+  const customerContext = useContext(CustomerContext);
+
+  if (!customerContext) {
+    throw new Error('useCustomerData must be used within a CustomerProvider');
+  }
+
+  const { customers } = customerContext;
+
+  return customers; // Assuming you want to use the first customer from the context array
+};
+
+export {useCustomerData, useFormSubmit};

@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { CustomerType } from './MyForm';
 import { error } from 'console';
-import { useCustomerContext } from '../Context/CustomerProvider';
+import { useCustomerContext, CustomerContext } from '../Context/CustomerProvider';
 import { TemplateType } from '../shared/types';
+import { useCustomerData, useFormSubmit } from '../shared/hooks';
+import RichTextEditor from './RichTextEditor';
 
 interface FormData {
   custId:number;
@@ -14,7 +16,7 @@ interface Template {
   text:string;
 }
 interface FormProps {
-  onSubmitTest: (data: FormData) => void;
+  onSubmitTest: (data: number) => void;
   //onSubmitTest2: (data: Template) =>void;
 }
 
@@ -25,19 +27,15 @@ const initialValues: FormData = {
 const TestForm: React.FC<FormProps> = ({ onSubmitTest }) => {
 const [customersData, setCustomersData] = useState<Array<CustomerType>>([]);
 const [templateData, setTemplateData] = useState<Array<TemplateType>>([]);
+const { handleClearEditor } = useFormSubmit();
+const [generatedText, setGeneratedText] = useState('');
+
+const [templateId, setTemplateId] = useState<number | undefined>(undefined);
+
 const { customers, setCustomers } = useCustomerContext();
+const customer = useCustomerData()
 
 
-
-
-//mock data
-const data = `Hello {username}, thank you for purchasing {product} from {company}. Sincerely, {company}.`
-const regex = /{(.*?)}/g;
-const someObj ={
-  username:'Me',
-  product:'You',
-  company: 'Everyone'
-}
 useEffect(() => {
   console.log(customers);
   
@@ -59,19 +57,16 @@ function getCustomers(custId: number) {
     });
 }
 
-function getTemplate(tempId:number){
-  console.log('getTemplate here');
-  fetch(`http://localhost:3000/templates/${tempId}`, {
-    method: 'GET'
-  })
-    .then(res => res.json())
-    .then(json => {
-      setTemplateData(json); // Use setCustomers directly, it's available in this scope
-    })
-    .catch((error) => {
-      console.error('Error fetching: ', error);
-    });
+async function getTemplateById(templateId:number){
+
+    const res = await fetch(`http://localhost:3000/templates/${templateId}`);
+    const data = await res.json();
+    return data[0];
   
+}
+
+function replacePlaceholders(template: string, customer: any) {
+  return template.replace(/{(.*?)}/g, (match, key) => customer[key.trim()] || '');
 }
 
 function runFilter(){
@@ -81,33 +76,54 @@ console.log(custData.id);
 
 }
 
-function templateRun(){
 
+const handleTemplateClick = async ()=>{
+  if(templateId){
+    try{
+      
+      const template = await getTemplateById(templateId);
+        const message = replacePlaceholders(template.text, customer[0]);
+        console.log(message);
+        setGeneratedText(message);
+      
+    }
+    catch(error){
+      console.log('Error fetching template, ', error);
+    }
+  }else{
+console.warn('Please enter a valid template ID');
+
+  }
 }
 
 
   const handleSubmitTest = (values: FormData) => {
-    const custId = values.custId;
-    //console.log(values.custId);
-    console.log(`${custId}:`+typeof(custId));
-    getCustomers(custId)
+    console.log(values);
     
-    //getCustomers(custId)
-    //onSubmitTest(values);
+    const custId = values.custId;
+    getCustomers(custId);
+    onSubmitTest(custId);
+   
   };
 
   return (
     <><Formik initialValues={initialValues} onSubmit={handleSubmitTest}>
       <Form>
         <div>
-          <label htmlFor="custId">ID:</label>
+          <label htmlFor="custId">Test ID:</label>
           <Field type="number" id="custId" name="custId" />
         </div>
         <button type="submit">Find</button>
       </Form>
     </Formik>
-    <button onClick={runFilter}>Log Check</button>
-    
+    <button onClick={runFilter}>Test Log Check</button>
+    <div>
+      <label htmlFor="templateId">Test Template ID:</label>
+      <input type="number" id="templateId" value={templateId || ''} onChange={(e) => setTemplateId(Number(e.target.value))} />
+      <button onClick={handleTemplateClick}>Generate Message</button>
+    </div>
+    <div><p>----------------------------------------------------------</p></div>
+    <RichTextEditor text={generatedText} onClearEditor={handleClearEditor} />
     </>
     
   );
